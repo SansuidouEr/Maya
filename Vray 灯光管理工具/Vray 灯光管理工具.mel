@@ -1,0 +1,46 @@
+//Vray 灯光管理工具//
+// 作者：三岁豆 , 创建日期 2023.05.28 //
+
+//判断窗口Window是否存在//
+
+/// 断开默认灯光链接
+proc DefaultLightLink(string $mode){ 
+    string $SelLight[] = `ls -transforms  -sl -dag `;
+    for($light in $SelLight){
+    if($mode=="Break"){
+                 disconnectAttr -nextAvailable ($light  + ".instObjGroups[0]")  defaultLightSet.dagSetMembers;
+                print( $light +" 默认灯光链接已断开 "+ "\n"); 
+                }
+    }
+ }
+
+proc Invisible()
+{
+    string $sel[0] = `ls -sl -dag -type shape`; //$sel=选择的物体，-dag 组内对象生效
+    for ($one in $sel) //对$sel中所有执行
+    if(`objExists ($one+".invisible")`)
+{setAttr ($one+".invisible") 1;}
+
+print $sel"已关闭可见性！；\n";
+}
+
+string $WindowLing = "WindowLing";
+if (`window -ex $WindowLing`)
+{
+    deleteUI -window $WindowLing;
+}
+
+string $windowlin = `window -title "三岁豆Er"
+       -sizeable 0 
+       $WindowLing`;
+columnLayout  -columnAttach "both" 10 -rowSpacing 5 -columnWidth 230;
+      text  -h 50  -label"Vray 灯光管理工具";
+       button -label "断开Vray默认" -bgc 0.4  1.0 1.0-c  "DefaultLightLink(\"Break\")";
+       button -label "灯光可见性" -bgc 1.0 1.0 0.2 -c  "Invisible";
+       button -label "生成灯光链接"  -c  "MakeLightLinks";
+       button -label "断开灯光链接" -c "BreakLightLinks";
+       button -label "选择照明对象的灯光" -c "SelectLightsIlluminatingObject";
+       button -label "选择灯光照明的对象" -c "SelectObjectsIlluminatedByLight";
+       text  -h 5 -label"";
+setParent ..;
+showWindow $WindowLing;
