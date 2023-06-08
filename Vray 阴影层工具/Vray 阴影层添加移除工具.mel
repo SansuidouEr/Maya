@@ -1,0 +1,34 @@
+//Vray 阴影层添加移除工具//
+// 作者：三岁豆 , 创建日期 2023.05.28 //
+
+//定义创建阴影层并设置参数//
+
+proc YY()
+{
+    createNode "VRayObjectProperties" -n "vrayobjectproperties";
+    setAttr "vrayobjectproperties.alphaContribution" -1;
+    setAttr "vrayobjectproperties.affectAlpha" 1;
+    setAttr "vrayobjectproperties.shadows" 1;
+    setAttr "vrayobjectproperties.matteSurface" 1;
+    setAttr "vrayobjectproperties.matteForSecondaryRays" 1;
+}
+
+//判断窗口WindowDou是否存在//
+string $WindowDou = "WindowDou";//定义窗口名称
+
+if (`window -ex $WindowDou`)
+{
+    deleteUI -window $WindowDou;
+}
+
+string $windowsdw = `window -title "三岁豆Er"
+       -sizeable 0
+       $WindowDou`;
+columnLayout  -columnAttach "both" 10 -rowSpacing 5 -columnWidth 230;
+      text  -h 50  -label"Vray 阴影层添加移除工具";
+       button -label "添加" -command "sets -edit -forceElement  vrayobjectproperties";
+       button -label "移除" -command "sets -edit -rm  vrayobjectproperties;";
+       button -label "创建阴影层" -command "YY";
+       text  -h 5 -label"";
+setParent ..;
+showWindow $WindowDou;
