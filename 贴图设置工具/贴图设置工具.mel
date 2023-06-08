@@ -1,0 +1,115 @@
+//贴图设置工具//
+// 作者：三岁豆 , 创建日期 2023.06.07 //
+
+
+////////////忽略所有贴图色彩空间规则///////////////
+proc Ignoreall(){ 
+        string $FileJD[]=`ls -type file`;
+        for ($one in $FileJD){
+        setAttr ($one+".ignoreColorSpaceFileRules") 1;
+        print ("所有贴图忽略颜色空间规则成功"+"\n");
+        }
+}
+
+////////////设置格式为 sRGB 忽略规则///////////////
+proc BsRGB(){
+        string $sRGBsel[] = `ls -sl`;
+        for($i=0; $i<`size($sRGBsel)`; $i++)
+        {
+           setAttr  -type "string" ($sRGBsel[$i] + ".colorSpace")"sRGB"; 
+           setAttr ($sRGBsel[$i]+ ".ignoreColorSpaceFileRules") 1;
+           print ("  Utility - sRGB - Texture设置成功"+"\n");
+        }
+}
+
+////////////设置格式为Raw  忽略规则  Alpha为亮度///////////////
+proc BRaw(){
+        string $Rawsel[] = `ls -sl`;
+        for($i=0; $i<`size($Rawsel)`; $i++){
+           setAttr  -type "string" ($Rawsel[$i] + ".colorSpace")"Raw"; 
+           setAttr ($Rawsel[$i]+ ".ignoreColorSpaceFileRules") 1;
+           setAttr ($Rawsel[$i]+ ".alphaIsLuminance") 1;
+           print ("  Utility - Raw  设置成功"+"\n");
+       }
+}
+
+////////////设置格式为 Utility - sRGB - Texture 忽略规则///////////////
+proc BUsRGB(){
+        string $Usrgbsel[] = `ls -sl`;
+        for($i=0; $i<`size($Usrgbsel)`; $i++)
+        {
+           setAttr  -type "string" ($Usrgbsel[$i] + ".colorSpace")"Utility - sRGB - Texture"; 
+           setAttr ($Usrgbsel[$i]+ ".ignoreColorSpaceFileRules") 1;
+           print ("  Utility - sRGB - Texture设置成功"+"\n");
+        }
+}
+
+////////////设置格式为 Utility - RAW 忽略规则 Alpha为亮度///////////////
+proc BUraw(){
+        string $URAWsel[] = `ls -sl`;
+        for($i=0; $i<`size($URAWsel)`; $i++){
+           setAttr  -type "string" ($URAWsel[$i] + ".colorSpace")"Utility - Raw"; 
+           setAttr ($URAWsel[$i]+ ".ignoreColorSpaceFileRules") 1;
+           setAttr ($URAWsel[$i]+ ".alphaIsLuminance") 1;
+           print ("  Utility - Raw  设置成功"+"\n");
+        }
+}
+
+//批量连接2dTexture到贴图File节点，先选择2dTexture，后选择贴图节点（可支持rs法线贴图连接）//
+proc B2dtex(){
+string $Nsel[] = `ls -sl`;
+string $NTile = ($Nsel[0]+".repeatUV");
+select -d $Nsel[0];
+string $sel[] = `ls -sl`;
+for($i=0;$i<`size($sel)`;$i++)
+{
+    if(`objectType $sel[$i]`=="file")
+    {
+        connectAttr -force ($Nsel[0]+".coverage") ($sel[$i]+".coverage");
+        connectAttr -force ($Nsel[0]+".mirrorU") ($sel[$i]+".mirrorU");
+        connectAttr -force ($Nsel[0]+".mirrorV") ($sel[$i]+".mirrorV");
+        connectAttr -force ($Nsel[0]+".noiseUV") ($sel[$i]+".noiseUV");
+        connectAttr -force ($Nsel[0]+".offset") ($sel[$i]+".offset");
+        connectAttr -force ($Nsel[0]+".uvFilterSize") ($sel[$i]+".uvFilterSize");
+        connectAttr -force ($Nsel[0]+".repeatUV") ($sel[$i]+".repeatUV");
+        connectAttr -force ($Nsel[0]+".rotateFrame") ($sel[$i]+".rotateFrame");
+        connectAttr -force ($Nsel[0]+".rotateUV") ($sel[$i]+".rotateUV");
+        connectAttr -force ($Nsel[0]+".stagger") ($sel[$i]+".stagger");
+        connectAttr -force ($Nsel[0]+".translateFrame") ($sel[$i]+".translateFrame");
+        connectAttr -force ($Nsel[0]+".vertexCameraOne") ($sel[$i]+".vertexCameraOne");
+        connectAttr -force ($Nsel[0]+".vertexUvOne") ($sel[$i]+".vertexUvOne");
+        connectAttr -force ($Nsel[0]+".vertexUvThree") ($sel[$i]+".vertexUvThree");
+        connectAttr -force ($Nsel[0]+".vertexUvTwo") ($sel[$i]+".vertexUvTwo");
+        connectAttr -force ($Nsel[0]+".wrapU") ($sel[$i]+".wrapU");
+        connectAttr -force ($Nsel[0]+".wrapV") ($sel[$i]+".wrapV");
+        connectAttr -force ($Nsel[0]+".outUV") ($sel[$i]+".uvCoord");
+    }
+    else if(`objectType $sel[$i]`=="RedshiftNormalMap")
+    {
+        connectAttr -f $NTile ($sel[$i]+".repeats");
+    }
+}    
+}
+
+///////////////////主要窗口//////////////////
+string $WindowMapColor = "WindowMapColor";
+
+if (`window -ex $WindowMapColor`)
+{
+    deleteUI -window $WindowMapColor;
+}
+
+string $windowtex = `window -title "三岁豆Er"
+       -sizeable 0
+       $WindowMapColor`;
+columnLayout  -columnAttach "both" 10 -rowSpacing 5 -columnWidth 230;
+       text  -h 50  -label"贴图设置工具";
+       button -label "忽略所有贴图色彩空间规则" -bgc 0.2 0.8 0.9 -c "Ignoreall()";
+       button -label "2dTexture" -c "B2dtex()";
+       button -label "sRGB" -c "BsRGB()";
+       button -label "Raw" -c "BRaw()";
+       button -label "Utility - sRGB"  -c  "BUsRGB()";
+       button -label "Utility - Raw"  -c  "BUraw()";
+       text  -h 5 -label"";
+setParent ..;
+showWindow $WindowMapColor;
