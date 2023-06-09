@@ -18,7 +18,8 @@ proc BsRGB(){
         {
            setAttr  -type "string" ($sRGBsel[$i] + ".colorSpace")"sRGB"; 
            setAttr ($sRGBsel[$i]+ ".ignoreColorSpaceFileRules") 1;
-           print ("  Utility - sRGB - Texture设置成功"+"\n");
+           setAttr ($sRGBsel[$i]+ ".alphaIsLuminance") 0;
+           print (" sRGB 设置成功"+"\n");
         }
 }
 
@@ -29,7 +30,7 @@ proc BRaw(){
            setAttr  -type "string" ($Rawsel[$i] + ".colorSpace")"Raw"; 
            setAttr ($Rawsel[$i]+ ".ignoreColorSpaceFileRules") 1;
            setAttr ($Rawsel[$i]+ ".alphaIsLuminance") 1;
-           print ("  Utility - Raw  设置成功"+"\n");
+           print (" Raw 设置成功"+"\n");
        }
 }
 
@@ -40,6 +41,7 @@ proc BUsRGB(){
         {
            setAttr  -type "string" ($Usrgbsel[$i] + ".colorSpace")"Utility - sRGB - Texture"; 
            setAttr ($Usrgbsel[$i]+ ".ignoreColorSpaceFileRules") 1;
+           setAttr ($Usrgbsel[$i]+ ".alphaIsLuminance") 0;
            print ("  Utility - sRGB - Texture设置成功"+"\n");
         }
 }
